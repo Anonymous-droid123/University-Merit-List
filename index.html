@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>University Merit List System</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --surface3: #212d42;
+    --border: #2a3a55;
+    --accent: #3b82f6;
+    --accent2: #06b6d4;
+    --gold: #f59e0b;
+    --silver: #9ca3af;
+    --bronze: #b45309;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --text: #f1f5f9;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --font-head: 'Playfair Display', serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ---- SCROLLBAR ---- */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ---- HEADER ---- */
+  .header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-inner {
+    max-width: 1400px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .logo-icon {
+    width: 38px; height: 38px; background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .logo-text { font-family: var(--font-head); font-size: 1.2rem; color: var(--text); }
+  .logo-sub { font-size: 11px; color: var(--text3); font-family: var(--font-mono); letter-spacing: 1px; }
+
+  .nav { display: flex; gap: 4px; }
+  .nav-btn {
+    padding: 6px 14px; border-radius: 8px; border: none; cursor: pointer;
+    font-family: var(--font-body); font-size: 13px; font-weight: 500;
+    background: transparent; color: var(--text2);
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { background: var(--surface2); color: var(--text); }
+  .nav-btn.active { background: var(--accent); color: #fff; }
+
+  /* ---- LAYOUT ---- */
+  .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+  /* ---- STAT CARDS ---- */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px; margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1.2rem;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: var(--accent); }
+  .stat-label { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .stat-value { font-size: 26px; font-weight: 600; font-family: var(--font-mono); color: var(--text); }
+  .stat-sub { font-size: 12px; color: var(--text3); margin-top: 4px; }
+  .stat-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+
+  /* ---- PANELS ---- */
+  .panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden;
+  }
+  .panel-header {
+    padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface2);
+  }
+  .panel-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .panel-body { padding: 1.5rem; }
+
+  /* ---- TABS ---- */
+  .tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--surface2); }
+  .tab {
+    padding: 12px 20px; font-size: 13px; font-weight: 500; cursor: pointer;
+    border-bottom: 2px solid transparent; color: var(--text2);
+    transition: all 0.2s; border: none; background: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ---- FORMS ---- */
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label { font-size: 12px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.6px; }
+  .form-control {
+    background: var(--surface3); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 9px 12px; color: var(--text);
+    font-family: var(--font-body); font-size: 14px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-control:focus { border-color: var(--accent); }
+  .form-control::placeholder { color: var(--text3); }
+  select.form-control option { background: var(--surface3); }
+
+  /* ---- BUTTONS ---- */
+  .btn {
+    padding: 9px 18px; border-radius: var(--radius); border: none; cursor: pointer;
+    font-family: var(--font-body); font-size: 13px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-success:hover { background: #059669; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover { background: #dc2626; }
+  .btn-ghost {
+    background: transparent; color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-warning { background: var(--warning); color: #000; }
+
+  /* ---- TABLE ---- */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    background: var(--surface3); padding: 10px 14px;
+    text-align: left; font-size: 11px; font-weight: 600;
+    color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px;
+    border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td { padding: 11px 14px; color: var(--text); vertical-align: middle; }
+  tbody tr:last-child { border-bottom: none; }
+
+  /* ---- BADGES ---- */
+  .badge {
+    padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    display: inline-block; font-family: var(--font-mono);
+  }
+  .badge-blue { background: rgba(59,130,246,0.15); color: #93c5fd; }
+  .badge-green { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+  .badge-red { background: rgba(239,68,68,0.15); color: #fca5a5; }
+  .badge-yellow { background: rgba(245,158,11,0.15); color: #fcd34d; }
+  .badge-gray { background: rgba(100,116,139,0.15); color: #94a3b8; }
+  .badge-cyan { background: rgba(6,182,212,0.15); color: #67e8f9; }
+
+  /* ---- RANK MEDALS ---- */
+  .rank-medal { font-size: 16px; }
+  .rank-num {
+    width: 28px; height: 28px; border-radius: 50%; display: inline-flex;
+    align-items: center; justify-content: center; font-size: 11px;
+    font-weight: 700; font-family: var(--font-mono);
+  }
+  .rank-1 { background: rgba(245,158,11,0.2); color: var(--gold); border: 1px solid rgba(245,158,11,0.4); }
+  .rank-2 { background: rgba(156,163,175,0.2); color: var(--silver); border: 1px solid rgba(156,163,175,0.4); }
+  .rank-3 { background: rgba(180,83,9,0.2); color: var(--bronze); border: 1px solid rgba(180,83,9,0.4); }
+  .rank-n { background: var(--surface3); color: var(--text3); border: 1px solid var(--border); }
+
+  /* ---- DSA VISUALIZER ---- */
+  .dsa-box {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1rem; margin-bottom: 12px;
+  }
+  .dsa-title { font-family: var(--font-mono); font-size: 12px; color: var(--accent2); margin-bottom: 8px; font-weight: 500; }
+  .dsa-bars { display: flex; align-items: flex-end; gap: 4px; height: 80px; }
+  .dsa-bar {
+    flex: 1; border-radius: 4px 4px 0 0; transition: all 0.4s;
+    min-width: 8px; position: relative;
+  }
+  .dsa-bar.comparing { background: var(--gold) !important; }
+  .dsa-bar.sorted { background: var(--success) !important; }
+  .dsa-bar.pivot { background: var(--danger) !important; }
+
+  .algo-log {
+    background: #0a0e1a; border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 10px; font-family: var(--font-mono); font-size: 11px;
+    color: var(--accent2); max-height: 120px; overflow-y: auto;
+    line-height: 1.7;
+  }
+  .log-line { display: block; }
+  .log-line.step { color: var(--text2); }
+  .log-line.done { color: var(--success); }
+
+  /* ---- SEARCH BAR ---- */
+  .search-row {
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .search-input-wrap { position: relative; flex: 1; min-width: 200px; }
+  .search-icon {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--text3); font-size: 14px;
+  }
+  .search-input {
+    background: var(--surface3); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 9px 12px 9px 34px;
+    color: var(--text); font-family: var(--font-body); font-size: 14px;
+    outline: none; width: 100%; transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+
+  /* ---- PAGE SECTIONS ---- */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ---- PROGRESS BAR ---- */
+  .progress-bar-wrap { background: var(--surface3); border-radius: 4px; height: 6px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 4px; transition: width 0.5s; }
+
+  /* ---- LINKED LIST VISUAL ---- */
+  .linked-list-vis { display: flex; align-items: center; flex-wrap: wrap; gap: 0; margin: 10px 0; overflow-x: auto; padding-bottom: 4px; }
+  .ll-node {
+    display: flex; align-items: center; background: var(--surface3);
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 10px;
+    font-family: var(--font-mono); font-size: 11px; color: var(--text);
+    min-width: 90px; flex-shrink: 0; transition: all 0.3s;
+  }
+  .ll-node.head { border-color: var(--accent); }
+  .ll-node.tail { border-color: var(--success); }
+  .ll-arrow { color: var(--text3); font-size: 14px; padding: 0 2px; flex-shrink: 0; }
+  .ll-null { color: var(--danger); font-family: var(--font-mono); font-size: 11px; padding: 6px 10px; }
+
+  /* ---- BST VISUAL ---- */
+  .bst-canvas-wrap { overflow-x: auto; }
+  canvas#bstCanvas { display: block; margin: 0 auto; }
+
+  /* ---- QUEUE STACK VISUAL ---- */
+  .qs-vis { display: flex; gap: 2rem; flex-wrap: wrap; }
+  .qs-col { flex: 1; min-width: 160px; }
+  .qs-label { font-size: 11px; color: var(--text3); font-family: var(--font-mono); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.8px; }
+  .qs-items { display: flex; flex-direction: column; gap: 4px; }
+  .qs-item {
+    background: var(--surface3); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 10px; font-family: var(--font-mono);
+    font-size: 12px; color: var(--text); transition: all 0.3s;
+  }
+  .qs-item.top { border-color: var(--accent); color: var(--accent); }
+  .qs-item.front { border-color: var(--success); color: var(--success); }
+
+  /* ---- HASH TABLE VISUAL ---- */
+  .hash-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 6px; }
+  .hash-bucket {
+    background: var(--surface3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px; min-height: 48px;
+  }
+  .hash-bucket-idx { font-family: var(--font-mono); font-size: 10px; color: var(--text3); margin-bottom: 4px; }
+  .hash-bucket-val { font-family: var(--font-mono); font-size: 11px; color: var(--accent2); }
+
+  /* ---- NOTIFICATION ---- */
+  #notification {
+    position: fixed; top: 80px; right: 24px; z-index: 999;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 12px 18px;
+    font-size: 13px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    max-width: 320px;
+  }
+  #notification.show { opacity: 1; pointer-events: auto; }
+  #notification.success { border-left: 3px solid var(--success); }
+  #notification.error { border-left: 3px solid var(--danger); }
+  #notification.info { border-left: 3px solid var(--accent); }
+
+  /* ---- MODAL ---- */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200;
+    display: none; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 2rem; max-width: 500px; width: 90%;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal-title { font-family: var(--font-head); font-size: 1.2rem; margin-bottom: 1.5rem; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.5rem; }
+
+  /* ---- COMPLEXITY TABLE ---- */
+  .complexity-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+  .complexity-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1rem;
+  }
+  .complexity-name { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+  .complexity-row { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; border-bottom: 1px solid var(--border); }
+  .complexity-row:last-child { border-bottom: none; }
+  .complexity-key { color: var(--text3); }
+  .complexity-val { font-family: var(--font-mono); color: var(--accent2); }
+
+  /* ---- LOADING ---- */
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---- MISC ---- */
+  .gap-8 { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .mt-1 { margin-top: 0.5rem; }
+  .mt-2 { margin-top: 1rem; }
+  .mt-3 { margin-top: 1.5rem; }
+  .mb-1 { margin-bottom: 0.5rem; }
+  .mb-2 { margin-bottom: 1rem; }
+  .text-sm { font-size: 13px; }
+  .text-muted { color: var(--text2); }
+  .text-xs { font-size: 11px; color: var(--text3); }
+  .mono { font-family: var(--font-mono); }
+  .divider { height: 1px; background: var(--border); margin: 1rem 0; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+  @media (max-width: 900px) { .three-col { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .three-col { grid-template-columns: 1fr; } }
+  .empty-state { text-align: center; padding: 3rem; color: var(--text3); font-size: 14px; }
+  .empty-icon { font-size: 2.5rem; margin-bottom: 10px; }
+
+  .chip {
+    padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500;
+    border: 1px solid var(--border); color: var(--text2); background: var(--surface3);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .chip:hover, .chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  
+  .grade-A { color: #6ee7b7; font-weight: 600; }
+  .grade-B { color: #93c5fd; font-weight: 600; }
+  .grade-C { color: #fcd34d; font-weight: 600; }
+  .grade-D { color: #fca5a5; font-weight: 600; }
+  .grade-F { color: #ef4444; font-weight: 600; }
+
+  .section-heading {
+    font-family: var(--font-head); font-size: 1.5rem; margin-bottom: 1.5rem;
+    color: var(--text); display: flex; align-items: center; gap: 10px;
+  }
+  .section-heading span { font-size: 1.8rem; }
+</style>
+</head>
+<body>
+
+<!-- NOTIFICATION -->
+<div id="notification"></div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">🎓</div>
+      <div>
+        <div class="logo-text">UniMerit DSA</div>
+        <div class="logo-sub">MERIT LIST SYSTEM v2.0</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" onclick="showSection('dashboard')">Dashboard</button>
+      <button class="nav-btn" onclick="showSection('students')">Students</button>
+      <button class="nav-btn" onclick="showSection('meritlist')">Merit List</button>
+      <button class="nav-btn" onclick="showSection('dsa')">DSA Visualizer</button>
+      <button class="nav-btn" onclick="showSection('search')">Search</button>
+      <button class="nav-btn" onclick="showSection('about')">About</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ADD STUDENT MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-title">➕ Add New Student</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Roll Number *</label>
+        <input class="form-control" id="m_roll" placeholder="e.g. CS-2024-001">
+      </div>
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input class="form-control" id="m_name" placeholder="Student Name">
+      </div>
+      <div class="form-group">
+        <label>Department</label>
+        <select class="form-control" id="m_dept">
+          <option>Computer Science</option>
+          <option>Electrical Engineering</option>
+          <option>Mathematics</option>
+          <option>Physics</option>
+          <option>Business Admin</option>
+          <option>Civil Engineering</option>
+          <option>Mechanical Engineering</option>
+          <option>Biotechnology</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Marks Obtained *</label>
+        <input class="form-control" id="m_marks" type="number" min="0" max="1100" placeholder="Out of 1100">
+      </div>
+      <div class="form-group">
+        <label>Total Marks</label>
+        <input class="form-control" id="m_total" type="number" value="1100" placeholder="1100">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input class="form-control" id="m_email" type="email" placeholder="student@uni.edu">
+      </div>
+      <div class="form-group">
+        <label>City</label>
+        <input class="form-control" id="m_city" placeholder="City">
+      </div>
+      <div class="form-group">
+        <label>Gender</label>
+        <select class="form-control" id="m_gender">
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addStudent()">➕ Add Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT STUDENT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-title">✏️ Edit Student</div>
+    <input type="hidden" id="e_idx">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Roll Number</label>
+        <input class="form-control" id="e_roll" placeholder="Roll Number">
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input class="form-control" id="e_name" placeholder="Name">
+      </div>
+      <div class="form-group">
+        <label>Department</label>
+        <select class="form-control" id="e_dept">
+          <option>Computer Science</option>
+          <option>Electrical Engineering</option>
+          <option>Mathematics</option>
+          <option>Physics</option>
+          <option>Business Admin</option>
+          <option>Civil Engineering</option>
+          <option>Mechanical Engineering</option>
+          <option>Biotechnology</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Marks Obtained</label>
+        <input class="form-control" id="e_marks" type="number" min="0" max="1100">
+      </div>
+      <div class="form-group">
+        <label>Total Marks</label>
+        <input class="form-control" id="e_total" type="number">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input class="form-control" id="e_email" type="email">
+      </div>
+      <div class="form-group">
+        <label>City</label>
+        <input class="form-control" id="e_city">
+      </div>
+      <div class="form-group">
+        <label>Gender</label>
+        <select class="form-control" id="e_gender">
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEdit()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+
+<!-- ===================== DASHBOARD ===================== -->
+<section class="section active" id="sec-dashboard">
+  <div class="section-heading"><span>📊</span> Dashboard</div>
+  <div class="stats-grid" id="statsGrid"></div>
+
+  <div class="two-col" style="margin-bottom:1.5rem;">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">🏆 Top 5 Merit Holders</div>
+        <span class="badge badge-gold" style="background:rgba(245,158,11,0.15);color:#fcd34d;">Live</span>
+      </div>
+      <div class="panel-body" style="padding:0">
+        <div id="top5List"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">📈 Score Distribution</div>
+      </div>
+      <div class="panel-body">
+        <div id="scoreDistChart"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">🏛️ Department-wise Stats</div>
+      </div>
+      <div class="panel-body">
+        <div id="deptStats"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">⚡ Recent Activity</div>
+      </div>
+      <div class="panel-body">
+        <div id="activityLog" style="font-size:13px;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== STUDENTS ===================== -->
+<section class="section" id="sec-students">
+  <div class="section-heading"><span>👨‍🎓</span> Student Records</div>
+
+  <div class="panel mb-2" style="margin-bottom:1.5rem;">
+    <div class="panel-body">
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="studentSearch" placeholder="Search by name, roll, city…" oninput="renderStudents()">
+        </div>
+        <select class="form-control" id="deptFilter" onchange="renderStudents()" style="width:auto;">
+          <option value="">All Departments</option>
+          <option>Computer Science</option>
+          <option>Electrical Engineering</option>
+          <option>Mathematics</option>
+          <option>Physics</option>
+          <option>Business Admin</option>
+          <option>Civil Engineering</option>
+          <option>Mechanical Engineering</option>
+          <option>Biotechnology</option>
+        </select>
+        <select class="form-control" id="sortBy" onchange="renderStudents()" style="width:auto;">
+          <option value="marks">Sort: Marks ↓</option>
+          <option value="marks_asc">Sort: Marks ↑</option>
+          <option value="name">Sort: Name A-Z</option>
+          <option value="roll">Sort: Roll No</option>
+        </select>
+        <button class="btn btn-primary" onclick="openModal()">➕ Add Student</button>
+        <button class="btn btn-ghost" onclick="generateSampleData()">🎲 Load Sample</button>
+        <button class="btn btn-ghost" onclick="exportCSV()">📥 Export CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">📋 All Students (<span id="stuCount">0</span>)</div>
+      <div class="gap-8">
+        <button class="btn btn-danger btn-sm" onclick="clearAll()">🗑️ Clear All</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Roll No</th>
+            <th>Name</th>
+            <th>Dept</th>
+            <th>Marks</th>
+            <th>%</th>
+            <th>Grade</th>
+            <th>City</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="studentTable"></tbody>
+      </table>
+    </div>
+    <div id="stuEmpty" class="empty-state" style="display:none">
+      <div class="empty-icon">🎓</div>
+      <div>No students found. Add students or load sample data.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MERIT LIST ===================== -->
+<section class="section" id="sec-meritlist">
+  <div class="section-heading"><span>🥇</span> Merit List</div>
+
+  <div class="panel mb-2" style="margin-bottom:1.5rem;">
+    <div class="panel-body">
+      <div class="gap-8" style="margin-bottom:1rem;">
+        <span class="text-sm text-muted">Sort Algorithm:</span>
+        <div class="gap-8" id="algoChips">
+          <span class="chip active" onclick="selectAlgo('merge',this)">Merge Sort</span>
+          <span class="chip" onclick="selectAlgo('quick',this)">Quick Sort</span>
+          <span class="chip" onclick="selectAlgo('heap',this)">Heap Sort</span>
+          <span class="chip" onclick="selectAlgo('bubble',this)">Bubble Sort</span>
+          <span class="chip" onclick="selectAlgo('insertion',this)">Insertion Sort</span>
+          <span class="chip" onclick="selectAlgo('selection',this)">Selection Sort</span>
+          <span class="chip" onclick="selectAlgo('counting',this)">Counting Sort</span>
+        </div>
+      </div>
+      <div class="gap-8">
+        <select class="form-control" id="meritDept" onchange="generateMeritList()" style="width:auto;">
+          <option value="">All Departments</option>
+          <option>Computer Science</option>
+          <option>Electrical Engineering</option>
+          <option>Mathematics</option>
+          <option>Physics</option>
+          <option>Business Admin</option>
+          <option>Civil Engineering</option>
+          <option>Mechanical Engineering</option>
+          <option>Biotechnology</option>
+        </select>
+        <input type="number" class="form-control" id="seatLimit" value="50" min="1" max="500" style="width:100px;" placeholder="Seats">
+        <label class="text-sm text-muted">Seats</label>
+        <button class="btn btn-primary" onclick="generateMeritList()">🔄 Generate Merit List</button>
+        <button class="btn btn-success" onclick="exportMeritPDF()">📄 Print/Export</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-bottom:1.5rem;">
+    <div class="dsa-box">
+      <div class="dsa-title">⚙️ SORT VISUALIZATION — <span id="sortAlgoLabel">Merge Sort</span></div>
+      <div class="dsa-bars" id="sortBars"></div>
+      <div class="algo-log mt-1" id="sortLog">Waiting to sort...</div>
+    </div>
+    <div class="dsa-box" style="padding:1rem;">
+      <div class="dsa-title">📊 ALGORITHM COMPLEXITY</div>
+      <div id="algoComplexity"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">🏅 Merit List — <span id="meritListTitle">All Departments</span></div>
+      <div class="gap-8">
+        <span class="badge badge-blue">Seats: <span id="meritSeats">50</span></span>
+        <span class="badge badge-green">Selected: <span id="meritSelected">0</span></span>
+        <span class="badge badge-red">Waiting: <span id="meritWaiting">0</span></span>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Merit Rank</th>
+            <th>Roll No</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Marks</th>
+            <th>Percentage</th>
+            <th>Grade</th>
+            <th>Status</th>
+            <th>Score Bar</th>
+          </tr>
+        </thead>
+        <tbody id="meritTable"></tbody>
+      </table>
+    </div>
+    <div id="meritEmpty" class="empty-state" style="display:none">
+      <div class="empty-icon">📋</div>
+      <div>No merit list generated. Add students and click Generate Merit List.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DSA VISUALIZER ===================== -->
+<section class="section" id="sec-dsa">
+  <div class="section-heading"><span>🔬</span> DSA Visualizer</div>
+
+  <div class="tabs" id="dsaTabs">
+    <button class="tab active" onclick="switchDSATab('linked',this)">Linked List</button>
+    <button class="tab" onclick="switchDSATab('bst',this)">Binary Search Tree</button>
+    <button class="tab" onclick="switchDSATab('queue',this)">Queue & Stack</button>
+    <button class="tab" onclick="switchDSATab('hash',this)">Hash Table</button>
+    <button class="tab" onclick="switchDSATab('complexity',this)">Complexity</button>
+  </div>
+
+  <!-- LINKED LIST TAB -->
+  <div id="dsa-linked" class="panel" style="border-top:none;border-radius:0 0 16px 16px;">
+    <div class="panel-body">
+      <div class="text-sm text-muted mb-2">Doubly Linked List — stores student records with prev/next pointers for O(1) insert/delete at head/tail.</div>
+      <div class="gap-8 mb-2">
+        <button class="btn btn-primary btn-sm" onclick="llInsertHead()">Insert Head</button>
+        <button class="btn btn-primary btn-sm" onclick="llInsertTail()">Insert Tail</button>
+        <button class="btn btn-ghost btn-sm" onclick="llDeleteHead()">Delete Head</button>
+        <button class="btn btn-ghost btn-sm" onclick="llDeleteTail()">Delete Tail</button>
+        <button class="btn btn-ghost btn-sm" onclick="llFromStudents()">Load from Students</button>
+        <button class="btn btn-danger btn-sm" onclick="llClear()">Clear</button>
+      </div>
+      <div class="dsa-box">
+        <div class="dsa-title">🔗 DOUBLY LINKED LIST VISUALIZATION</div>
+        <div class="linked-list-vis" id="llVis"></div>
+      </div>
+      <div class="dsa-box">
+        <div class="dsa-title">📋 NODE DATA</div>
+        <table style="width:100%;font-size:12px;">
+          <thead><tr><th>Index</th><th>Roll</th><th>Name</th><th>Marks</th><th>Prev</th><th>Next</th></tr></thead>
+          <tbody id="llTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- BST TAB -->
+  <div id="dsa-bst" class="panel" style="border-top:none;border-radius:0 0 16px 16px;display:none;">
+    <div class="panel-body">
+      <div class="text-sm text-muted mb-2">Binary Search Tree — students inserted by marks. In-order traversal gives sorted merit list. Average O(log n) search.</div>
+      <div class="gap-8 mb-2">
+        <button class="btn btn-primary btn-sm" onclick="bstInsertRandom()">Insert Random</button>
+        <button class="btn btn-ghost btn-sm" onclick="bstBuildFromStudents()">Build from Students</button>
+        <button class="btn btn-ghost btn-sm" onclick="bstInOrder()">In-Order Traversal</button>
+        <button class="btn btn-ghost btn-sm" onclick="bstPreOrder()">Pre-Order</button>
+        <button class="btn btn-ghost btn-sm" onclick="bstPostOrder()">Post-Order</button>
+        <button class="btn btn-danger btn-sm" onclick="bstClear()">Clear BST</button>
+      </div>
+      <div class="gap-8 mb-2">
+        <input class="form-control" id="bstSearch" placeholder="Search value…" style="width:150px;">
+        <button class="btn btn-primary btn-sm" onclick="bstSearch()">🔍 Search</button>
+      </div>
+      <div class="bst-canvas-wrap">
+        <canvas id="bstCanvas" width="900" height="360" style="background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border);max-width:100%;"></canvas>
+      </div>
+      <div class="algo-log mt-1" id="bstLog">BST ready. Insert nodes or build from students.</div>
+    </div>
+  </div>
+
+  <!-- QUEUE/STACK TAB -->
+  <div id="dsa-queue" class="panel" style="border-top:none;border-radius:0 0 16px 16px;display:none;">
+    <div class="panel-body">
+      <div class="text-sm text-muted mb-2">Queue (FIFO) manages admission waiting list. Stack (LIFO) tracks undo/history operations.</div>
+      <div class="gap-8 mb-2">
+        <button class="btn btn-primary btn-sm" onclick="queueEnqueue()">Enqueue (Admission)</button>
+        <button class="btn btn-ghost btn-sm" onclick="queueDequeue()">Dequeue</button>
+        <button class="btn btn-success btn-sm" onclick="stackPush()">Stack Push</button>
+        <button class="btn btn-ghost btn-sm" onclick="stackPop()">Stack Pop</button>
+        <button class="btn btn-ghost btn-sm" onclick="qsLoadStudents()">Load from Students</button>
+        <button class="btn btn-danger btn-sm" onclick="qsClear()">Clear</button>
+      </div>
+      <div class="qs-vis" id="qsVis"></div>
+      <div class="algo-log mt-2" id="qsLog">Queue & Stack ready.</div>
+    </div>
+  </div>
+
+  <!-- HASH TABLE TAB -->
+  <div id="dsa-hash" class="panel" style="border-top:none;border-radius:0 0 16px 16px;display:none;">
+    <div class="panel-body">
+      <div class="text-sm text-muted mb-2">Hash Table — O(1) average lookup of students by roll number. Uses polynomial rolling hash with chaining for collision handling.</div>
+      <div class="gap-8 mb-2">
+        <input class="form-control" id="hashKey" placeholder="Roll No" style="width:150px;">
+        <button class="btn btn-primary btn-sm" onclick="hashInsert()">Insert</button>
+        <button class="btn btn-ghost btn-sm" onclick="hashSearch()">Search</button>
+        <button class="btn btn-danger btn-sm" onclick="hashDelete()">Delete</button>
+        <button class="btn btn-success btn-sm" onclick="hashBuildFromStudents()">Build from Students</button>
+        <button class="btn btn-ghost btn-sm" onclick="hashClear()">Clear</button>
+      </div>
+      <div class="dsa-box">
+        <div class="dsa-title">🪣 HASH TABLE BUCKETS (Size: 16)</div>
+        <div class="hash-grid" id="hashGrid"></div>
+      </div>
+      <div class="algo-log mt-1" id="hashLog">Hash table ready.</div>
+    </div>
+  </div>
+
+  <!-- COMPLEXITY TAB -->
+  <div id="dsa-complexity" class="panel" style="border-top:none;border-radius:0 0 16px 16px;display:none;">
+    <div class="panel-body">
+      <div class="section-heading" style="font-size:1.1rem;margin-bottom:1rem;">🧠 Time & Space Complexity Reference</div>
+      <div class="complexity-grid" id="complexityCards"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SEARCH ===================== -->
+<section class="section" id="sec-search">
+  <div class="section-heading"><span>🔍</span> Advanced Search</div>
+
+  <div class="panel mb-2" style="margin-bottom:1.5rem;">
+    <div class="panel-header"><div class="panel-title">🔎 Search Algorithms</div></div>
+    <div class="panel-body">
+      <div class="gap-8 mb-2">
+        <span class="text-sm text-muted">Algorithm:</span>
+        <span class="chip active" id="srchLinear" onclick="selectSearch('linear',this)">Linear Search O(n)</span>
+        <span class="chip" id="srchBinary" onclick="selectSearch('binary',this)">Binary Search O(log n)</span>
+        <span class="chip" id="srchHash" onclick="selectSearch('hash',this)">Hash O(1)</span>
+        <span class="chip" id="srchJump" onclick="selectSearch('jump',this)">Jump Search O(√n)</span>
+      </div>
+      <div class="gap-8 mb-2">
+        <div class="search-input-wrap" style="flex:none;width:300px;">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="advSearch" placeholder="Name, Roll No or Marks…">
+        </div>
+        <select class="form-control" id="searchField" style="width:auto;">
+          <option value="name">Name</option>
+          <option value="roll">Roll Number</option>
+          <option value="marks">Marks</option>
+          <option value="dept">Department</option>
+        </select>
+        <button class="btn btn-primary" onclick="runAdvSearch()">⚡ Search</button>
+      </div>
+
+      <div class="dsa-box">
+        <div class="dsa-title">🔍 SEARCH VISUALIZATION</div>
+        <div id="searchVis" style="display:flex;flex-wrap:wrap;gap:4px;min-height:40px;"></div>
+      </div>
+      <div class="algo-log" id="searchLog">Select an algorithm and search for a student.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header"><div class="panel-title">📋 Search Results (<span id="srchCount">0</span>)</div></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Rank</th><th>Roll No</th><th>Name</th><th>Department</th><th>Marks</th><th>%</th><th>Grade</th></tr>
+        </thead>
+        <tbody id="searchResultTable"></tbody>
+      </table>
+    </div>
+    <div id="srchEmpty" class="empty-state" style="display:none">
+      <div class="empty-icon">🔍</div>
+      <div>Run a search to see results here.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ABOUT ===================== -->
+<section class="section" id="sec-about">
+  <div class="section-heading"><span>ℹ️</span> About This Project</div>
+  <div class="two-col">
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">📚 Project Overview</div></div>
+      <div class="panel-body" style="font-size:14px;line-height:1.9;color:var(--text2);">
+        <p><strong style="color:var(--text)">University Merit List System</strong> is a full DSA project demonstrating core data structures and algorithms through a real-world application.</p>
+        <div class="divider"></div>
+        <p>📌 <strong style="color:var(--text)">Core DSA Used:</strong></p>
+        <ul style="margin-left:1.2rem;margin-top:0.5rem;">
+          <li>Merge Sort / Quick Sort / Heap Sort for ranking</li>
+          <li>Binary Search Tree for hierarchical storage</li>
+          <li>Doubly Linked List for student record chain</li>
+          <li>Hash Table for O(1) roll-number lookup</li>
+          <li>Queue (FIFO) for admission waiting list</li>
+          <li>Stack (LIFO) for undo operations</li>
+          <li>Binary Search / Linear Search / Jump Search</li>
+          <li>Arrays for base storage</li>
+        </ul>
+        <div class="divider"></div>
+        <p>📌 <strong style="color:var(--text)">Features:</strong></p>
+        <ul style="margin-left:1.2rem;margin-top:0.5rem;">
+          <li>Add / Edit / Delete student records</li>
+          <li>Department-wise merit list generation</li>
+          <li>Real-time sort algorithm visualization</li>
+          <li>BST tree canvas drawing</li>
+          <li>Hash table with collision chaining</li>
+          <li>CSV export, merit list printing</li>
+          <li>Score distribution charts</li>
+          <li>Time/Space complexity reference</li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">⚙️ Technical Details</div></div>
+      <div class="panel-body">
+        <div class="complexity-grid" style="margin-bottom:1rem;" id="aboutComplexity"></div>
+        <div class="divider"></div>
+        <div class="dsa-box" style="margin-top:1rem;">
+          <div class="dsa-title">📂 DATA STRUCTURE ARCHITECTURE</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text2);line-height:2;">
+            <span style="color:var(--accent)">students[]</span> → Array (base storage)<br>
+            <span style="color:var(--accent2)">LinkedList</span> → Doubly linked record chain<br>
+            <span style="color:var(--gold)">BST</span> → Binary Search Tree by marks<br>
+            <span style="color:var(--success)">HashMap</span> → Roll → Student mapping<br>
+            <span style="color:var(--danger)">Queue</span> → Admission waiting list (FIFO)<br>
+            <span style="color:var(--warning)">Stack</span> → Operation history (LIFO)<br>
+            <span style="color:#a78bfa">MergeSort</span> → Primary merit ranking
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- end container -->
+
+<script>
+/* ===================================================
+   STATE
+=================================================== */
+let students = [];
+let currentAlgo = 'merge';
+let currentSearch = 'linear';
+let activityLog = [];
+
+// DSA structures
+let ll = { head: null, tail: null, size: 0 };
+let bst = { root: null };
+let queue = [];
+let stack = [];
+let hashTable = new Array(16).fill(null).map(() => []);
+
+/* ===================================================
+   UTILITY
+=================================================== */
+function pct(marks, total) { return ((marks / total) * 100).toFixed(1); }
+function grade(p) {
+  if (p >= 90) return 'A+';
+  if (p >= 80) return 'A';
+  if (p >= 70) return 'B+';
+  if (p >= 60) return 'B';
+  if (p >= 50) return 'C';
+  if (p >= 40) return 'D';
+  return 'F';
+}
+function gradeClass(g) {
+  if (g.startsWith('A')) return 'grade-A';
+  if (g.startsWith('B')) return 'grade-B';
+  if (g.startsWith('C')) return 'grade-C';
+  if (g.startsWith('D')) return 'grade-D';
+  return 'grade-F';
+}
+function gradeBadge(g) {
+  const cls = {'A+':'badge-green','A':'badge-green','B+':'badge-blue','B':'badge-blue','C':'badge-yellow','D':'badge-yellow','F':'badge-red'};
+  return `<span class="badge ${cls[g]||'badge-gray'}">${g}</span>`;
+}
+function rankNode(r) {
+  if (r === 1) return `<span class="rank-num rank-1">1</span>`;
+  if (r === 2) return `<span class="rank-num rank-2">2</span>`;
+  if (r === 3) return `<span class="rank-num rank-3">3</span>`;
+  return `<span class="rank-num rank-n">${r}</span>`;
+}
+function notify(msg, type='info') {
+  const el = document.getElementById('notification');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+function addActivity(msg) {
+  const now = new Date().toLocaleTimeString();
+  activityLog.unshift(`[${now}] ${msg}`);
+  if (activityLog.length > 20) activityLog.pop();
+  renderActivity();
+}
+function renderActivity() {
+  const el = document.getElementById('activityLog');
+  if (!el) return;
+  if (!activityLog.length) { el.innerHTML = '<div class="text-sm text-muted">No activity yet.</div>'; return; }
+  el.innerHTML = activityLog.map((a,i) => `<div class="text-sm" style="padding:5px 0;border-bottom:1px solid var(--border);color:${i===0?'var(--text)':'var(--text2)'}">${a}</div>`).join('');
+}
+function getRankedStudents(arr) {
+  return [...arr].sort((a,b) => b.marks - a.marks).map((s,i) => ({...s, rank: i+1}));
+}
+function getFilteredStudents() {
+  const q = (document.getElementById('studentSearch').value || '').toLowerCase();
+  const dept = document.getElementById('deptFilter').value;
+  const sort = document.getElementById('sortBy').value;
+  let arr = students.filter(s => {
+    const match = !q || s.name.toLowerCase().includes(q) || s.roll.toLowerCase().includes(q) || (s.city||'').toLowerCase().includes(q);
+    const dMatch = !dept || s.dept === dept;
+    return match && dMatch;
+  });
+  if (sort === 'marks') arr.sort((a,b) => b.marks - a.marks);
+  else if (sort === 'marks_asc') arr.sort((a,b) => a.marks - b.marks);
+  else if (sort === 'name') arr.sort((a,b) => a.name.localeCompare(b.name));
+  else if (sort === 'roll') arr.sort((a,b) => a.roll.localeCompare(b.roll));
+  return arr;
+}
+
+/* ===================================================
+   NAVIGATION
+=================================================== */
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const labels = {dashboard:'Dashboard',students:'Students',meritlist:'Merit List',dsa:'DSA Visualizer',search:'Search',about:'About'};
+  document.querySelectorAll('.nav-btn').forEach(b => { if (b.textContent === labels[name]) b.classList.add('active'); });
+  if (name === 'dashboard') updateDashboard();
+  if (name === 'meritlist') generateMeritList();
+  if (name === 'dsa') { renderLL(); renderHashGrid(); renderQS(); }
+  if (name === 'about') renderAboutComplexity();
+}
+
+/* ===================================================
+   MODAL
+=================================================== */
+function openModal() { document.getElementById('addModal').classList.add('open'); }
+function closeModal() { document.getElementById('addModal').classList.remove('open'); }
+function closeEditModal() { document.getElementById('editModal').classList.remove('open'); }
+
+/* ===================================================
+   STUDENT CRUD
+=================================================== */
+function addStudent() {
+  const roll = document.getElementById('m_roll').value.trim();
+  const name = document.getElementById('m_name').value.trim();
+  const marks = parseInt(document.getElementById('m_marks').value);
+  const total = parseInt(document.getElementById('m_total').value) || 1100;
+  const dept = document.getElementById('m_dept').value;
+  const email = document.getElementById('m_email').value.trim();
+  const city = document.getElementById('m_city').value.trim();
+  const gender = document.getElementById('m_gender').value;
+
+  if (!roll || !name || isNaN(marks)) { notify('Please fill Roll, Name and Marks!', 'error'); return; }
+  if (marks < 0 || marks > total) { notify('Marks out of range!', 'error'); return; }
+  if (students.find(s => s.roll === roll)) { notify('Roll number already exists!', 'error'); return; }
+
+  students.push({ roll, name, marks, total, dept, email, city, gender, id: Date.now() });
+  closeModal();
+  ['m_roll','m_name','m_marks','m_email','m_city'].forEach(id => document.getElementById(id).value = '');
+  notify(`${name} added successfully!`, 'success');
+  addActivity(`➕ Added: ${name} (${roll})`);
+  renderStudents();
+  updateDashboard();
+}
+
+function deleteStudent(idx) {
+  const s = students[idx];
+  if (!confirm(`Delete ${s.name}?`)) return;
+  students.splice(idx, 1);
+  notify(`${s.name} deleted.`, 'info');
+  addActivity(`🗑️ Deleted: ${s.name}`);
+  renderStudents();
+  updateDashboard();
+}
+
+function editStudent(idx) {
+  const s = students[idx];
+  document.getElementById('e_idx').value = idx;
+  document.getElementById('e_roll').value = s.roll;
+  document.getElementById('e_name').value = s.name;
+  document.getElementById('e_dept').value = s.dept;
+  document.getElementById('e_marks').value = s.marks;
+  document.getElementById('e_total').value = s.total;
+  document.getElementById('e_email').value = s.email || '';
+  document.getElementById('e_city').value = s.city || '';
+  document.getElementById('e_gender').value = s.gender || 'Male';
+  document.getElementById('editModal').classList.add('open');
+}
+
+function saveEdit() {
+  const idx = parseInt(document.getElementById('e_idx').value);
+  const marks = parseInt(document.getElementById('e_marks').value);
+  const total = parseInt(document.getElementById('e_total').value) || 1100;
+  if (isNaN(marks) || marks < 0 || marks > total) { notify('Invalid marks!', 'error'); return; }
+  students[idx] = {
+    ...students[idx],
+    roll: document.getElementById('e_roll').value.trim(),
+    name: document.getElementById('e_name').value.trim(),
+    dept: document.getElementById('e_dept').value,
+    marks, total,
+    email: document.getElementById('e_email').value.trim(),
+    city: document.getElementById('e_city').value.trim(),
+    gender: document.getElementById('e_gender').value,
+  };
+  closeEditModal();
+  notify('Student updated!', 'success');
+  addActivity(`✏️ Edited: ${students[idx].name}`);
+  renderStudents();
+  updateDashboard();
+}
+
+function clearAll() {
+  if (!students.length) return;
+  if (!confirm('Clear all student records?')) return;
+  students = [];
+  notify('All records cleared.', 'info');
+  addActivity('🗑️ All records cleared.');
+  renderStudents();
+  updateDashboard();
+}
+
+/* ===================================================
+   RENDER STUDENTS TABLE
+=================================================== */
+function renderStudents() {
+  const ranked = getRankedStudents(students);
+  const rankMap = {};
+  ranked.forEach(s => rankMap[s.roll] = s.rank);
+
+  const arr = getFilteredStudents();
+  const tbody = document.getElementById('studentTable');
+  document.getElementById('stuCount').textContent = arr.length;
+
+  if (!arr.length) {
+    tbody.innerHTML = '';
+    document.getElementById('stuEmpty').style.display = 'block';
+    return;
+  }
+  document.getElementById('stuEmpty').style.display = 'none';
+
+  const idx = students;
+  tbody.innerHTML = arr.map(s => {
+    const p = pct(s.marks, s.total);
+    const g = grade(parseFloat(p));
+    const r = rankMap[s.roll] || '-';
+    const realIdx = students.findIndex(x => x.roll === s.roll);
+    return `<tr>
+      <td>${rankNode(r)}</td>
+      <td class="mono" style="color:var(--accent2)">${s.roll}</td>
+      <td style="font-weight:500">${s.name}</td>
+      <td><span class="badge badge-cyan">${s.dept}</span></td>
+      <td class="mono">${s.marks}/${s.total}</td>
+      <td class="mono ${p >= 60 ? 'grade-A' : p >= 40 ? 'grade-C' : 'grade-F'}">${p}%</td>
+      <td>${gradeBadge(g)}</td>
+      <td style="color:var(--text2)">${s.city || '-'}</td>
+      <td>
+        <div class="gap-8">
+          <button class="btn btn-ghost btn-sm" onclick="editStudent(${realIdx})">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteStudent(${realIdx})">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ===================================================
+   SAMPLE DATA
+=================================================== */
+function generateSampleData() {
+  const names = ['Ali Raza','Sara Khan','Ahmed Hassan','Fatima Noor','Usman Ali','Ayesha Siddiqui','Bilal Ahmed','Zara Malik','Hamza Sheikh','Nadia Hussain','Omar Farooq','Hina Baig','Zain Ul Abideen','Mariam Iqbal','Faisal Mirza','Sana Butt','Tariq Javed','Amna Rizvi','Imran Shahid','Rabia Aslam','Junaid Akhtar','Mehwish Qureshi','Danish Rana','Saima Chaudhry','Adnan Butt','Naila Aziz','Kamran Abbasi','Sundas Nawaz','Shahid Mehmood','Lubna Arshad'];
+  const rolls = ['CS','EE','MT','PH','BA','CE','ME','BT'];
+  const cities = ['Lahore','Karachi','Islamabad','Faisalabad','Multan','Rawalpindi','Rahim Yar Khan','Bahawalpur','Peshawar','Quetta'];
+  const depts = ['Computer Science','Electrical Engineering','Mathematics','Physics','Business Admin','Civil Engineering','Mechanical Engineering','Biotechnology'];
+  students = [];
+  names.forEach((name, i) => {
+    const dept = depts[i % depts.length];
+    const prefix = rolls[depts.indexOf(dept)];
+    students.push({
+      roll: `${prefix}-2024-${String(i+1).padStart(3,'0')}`,
+      name, dept,
+      marks: Math.floor(Math.random() * 500) + 550,
+      total: 1100,
+      email: `${name.toLowerCase().replace(/\s/,'.')}@uni.edu`,
+      city: cities[Math.floor(Math.random() * cities.length)],
+      gender: Math.random() > 0.5 ? 'Male' : 'Female',
+      id: Date.now() + i
+    });
+  });
+  notify('30 sample students loaded!', 'success');
+  addActivity('🎲 Sample data loaded (30 students)');
+  renderStudents();
+  updateDashboard();
+}
+
+/* ===================================================
+   DASHBOARD
+=================================================== */
+function updateDashboard() {
+  const ranked = getRankedStudents(students);
+  const total = students.length;
+  const avg = total ? (students.reduce((s,x) => s + parseFloat(pct(x.marks, x.total)), 0) / total).toFixed(1) : 0;
+  const passing = students.filter(s => parseFloat(pct(s.marks,s.total)) >= 40).length;
+  const depts = [...new Set(students.map(s => s.dept))].length;
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Total Students</div>
+      <div class="stat-value">${total}</div>
+      <div class="stat-sub">Registered</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg Score</div>
+      <div class="stat-value">${avg}%</div>
+      <div class="stat-sub">Class average</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Passing</div>
+      <div class="stat-value">${passing}</div>
+      <div class="stat-sub">≥40% criteria</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Failing</div>
+      <div class="stat-value">${total - passing}</div>
+      <div class="stat-sub" style="color:var(--danger)">&lt;40% marks</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Departments</div>
+      <div class="stat-value">${depts}</div>
+      <div class="stat-sub">Active depts</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Top Score</div>
+      <div class="stat-value">${total ? Math.max(...students.map(s=>s.marks)) : 0}</div>
+      <div class="stat-sub">Highest marks</div>
+    </div>
+  `;
+
+  // Top 5
+  const top5 = document.getElementById('top5List');
+  if (!ranked.length) { top5.innerHTML = '<div class="empty-state">No students yet.</div>'; }
+  else {
+    top5.innerHTML = ranked.slice(0,5).map(s => {
+      const p = pct(s.marks, s.total);
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border)">
+        ${rankNode(s.rank)}
+        <div style="flex:1">
+          <div style="font-weight:500;font-size:14px">${s.name}</div>
+          <div class="text-xs">${s.dept}</div>
+        </div>
+        <div class="mono" style="font-size:13px;color:var(--accent2)">${s.marks}</div>
+        <div>${gradeBadge(grade(parseFloat(p)))}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Score Distribution Chart
+  const bins = [0,40,50,60,70,80,90,100];
+  const labels = ['<40','40-49','50-59','60-69','70-79','80-89','90-99','100+'];
+  const counts = new Array(8).fill(0);
+  students.forEach(s => {
+    const p = parseFloat(pct(s.marks, s.total));
+    if (p < 40) counts[0]++;
+    else if (p < 50) counts[1]++;
+    else if (p < 60) counts[2]++;
+    else if (p < 70) counts[3]++;
+    else if (p < 80) counts[4]++;
+    else if (p < 90) counts[5]++;
+    else if (p < 100) counts[6]++;
+    else counts[7]++;
+  });
+  const maxC = Math.max(...counts, 1);
+  const colors = ['#ef4444','#f97316','#eab308','#84cc16','#22c55e','#3b82f6','#6366f1','#a855f7'];
+  document.getElementById('scoreDistChart').innerHTML = `
+    <div style="display:flex;align-items:flex-end;gap:6px;height:100px;">
+      ${counts.map((c,i) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+        <div class="text-xs mono">${c}</div>
+        <div style="width:100%;background:${colors[i]};border-radius:4px 4px 0 0;height:${Math.round((c/maxC)*70)+4}px;opacity:0.85;transition:height 0.5s"></div>
+        <div class="text-xs" style="white-space:nowrap">${labels[i]}</div>
+      </div>`).join('')}
+    </div>`;
+
+  // Dept stats
+  const deptMap = {};
+  students.forEach(s => {
+    if (!deptMap[s.dept]) deptMap[s.dept] = { count:0, total:0 };
+    deptMap[s.dept].count++;
+    deptMap[s.dept].total += parseFloat(pct(s.marks, s.total));
+  });
+  document.getElementById('deptStats').innerHTML = Object.entries(deptMap).map(([dept, d]) => `
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+        <span style="color:var(--text)">${dept}</span>
+        <span class="mono" style="color:var(--text2)">${d.count} students · ${(d.total/d.count).toFixed(1)}% avg</span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" style="width:${(d.total/d.count).toFixed(1)}%;background:var(--accent)"></div>
+      </div>
+    </div>`).join('') || '<div class="empty-state">No data.</div>';
+
+  renderActivity();
+}
+
+/* ===================================================
+   SORTING ALGORITHMS
+=================================================== */
+const algoComplexityData = {
+  merge:     { best:'O(n log n)', avg:'O(n log n)', worst:'O(n log n)', space:'O(n)', stable:true },
+  quick:     { best:'O(n log n)', avg:'O(n log n)', worst:'O(n²)',      space:'O(log n)', stable:false },
+  heap:      { best:'O(n log n)', avg:'O(n log n)', worst:'O(n log n)', space:'O(1)', stable:false },
+  bubble:    { best:'O(n)',       avg:'O(n²)',       worst:'O(n²)',      space:'O(1)', stable:true },
+  insertion: { best:'O(n)',       avg:'O(n²)',       worst:'O(n²)',      space:'O(1)', stable:true },
+  selection: { best:'O(n²)',      avg:'O(n²)',       worst:'O(n²)',      space:'O(1)', stable:false },
+  counting:  { best:'O(n+k)',     avg:'O(n+k)',      worst:'O(n+k)',     space:'O(k)', stable:true },
+};
+
+function selectAlgo(algo, el) {
+  currentAlgo = algo;
+  document.querySelectorAll('#algoChips .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('sortAlgoLabel').textContent = el.textContent;
+  renderAlgoComplexity();
+  generateMeritList();
+}
+
+function renderAlgoComplexity() {
+  const d = algoComplexityData[currentAlgo];
+  if (!d) return;
+  document.getElementById('algoComplexity').innerHTML = `
+    <div style="font-size:12px;line-height:2.2;">
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Best case:</span><span class="mono" style="color:var(--success)">${d.best}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Average:</span><span class="mono" style="color:var(--gold)">${d.avg}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Worst case:</span><span class="mono" style="color:var(--danger)">${d.worst}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Space:</span><span class="mono" style="color:var(--accent2)">${d.space}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Stable:</span><span class="mono" style="color:${d.stable?'var(--success)':'var(--danger)'}">${d.stable?'Yes':'No'}</span></div>
+    </div>`;
+}
+
+// Merge Sort
+function mergeSort(arr) {
+  if (arr.length <= 1) return arr;
+  const mid = Math.floor(arr.length / 2);
+  return merge(mergeSort(arr.slice(0, mid)), mergeSort(arr.slice(mid)));
+}
+function merge(l, r) {
+  const res = []; let i = 0, j = 0;
+  while (i < l.length && j < r.length) {
+    if (l[i].marks >= r[j].marks) res.push(l[i++]);
+    else res.push(r[j++]);
+  }
+  return res.concat(l.slice(i)).concat(r.slice(j));
+}
+
+// Quick Sort
+function quickSort(arr) {
+  if (arr.length <= 1) return arr;
+  const pivot = arr[Math.floor(arr.length / 2)];
+  const left = arr.filter(x => x.marks > pivot.marks);
+  const mid = arr.filter(x => x.marks === pivot.marks);
+  const right = arr.filter(x => x.marks < pivot.marks);
+  return [...quickSort(left), ...mid, ...quickSort(right)];
+}
+
+// Heap Sort
+function heapSort(arr) {
+  const a = [...arr];
+  const n = a.length;
+  for (let i = Math.floor(n/2)-1; i >= 0; i--) heapify(a, n, i);
+  for (let i = n-1; i > 0; i--) {
+    [a[0], a[i]] = [a[i], a[0]];
+    heapify(a, i, 0);
+  }
+  return a.reverse();
+}
+function heapify(arr, n, i) {
+  let largest = i, l = 2*i+1, r = 2*i+2;
+  if (l < n && arr[l].marks > arr[largest].marks) largest = l;
+  if (r < n && arr[r].marks > arr[largest].marks) largest = r;
+  if (largest !== i) { [arr[i], arr[largest]] = [arr[largest], arr[i]]; heapify(arr, n, largest); }
+}
+
+// Bubble Sort
+function bubbleSort(arr) {
+  const a = [...arr];
+  for (let i = 0; i < a.length; i++)
+    for (let j = 0; j < a.length-i-1; j++)
+      if (a[j].marks < a[j+1].marks) [a[j], a[j+1]] = [a[j+1], a[j]];
+  return a;
+}
+
+// Insertion Sort
+function insertionSort(arr) {
+  const a = [...arr];
+  for (let i = 1; i < a.length; i++) {
+    const key = a[i]; let j = i-1;
+    while (j >= 0 && a[j].marks < key.marks) { a[j+1] = a[j]; j--; }
+    a[j+1] = key;
+  }
+  return a;
+}
+
+// Selection Sort
+function selectionSort(arr) {
+  const a = [...arr];
+  for (let i = 0; i < a.length; i++) {
+    let maxIdx = i;
+    for (let j = i+1; j < a.length; j++) if (a[j].marks > a[maxIdx].marks) maxIdx = j;
+    [a[i], a[maxIdx]] = [a[maxIdx], a[i]];
+  }
+  return a;
+}
+
+// Counting Sort (by % score * 10, integer)
+function countingSort(arr) {
+  if (!arr.length) return arr;
+  const scores = arr.map(s => Math.round(parseFloat(pct(s.marks, s.total)) * 10));
+  const max = Math.max(...scores);
+  const count = new Array(max + 1).fill(0);
+  scores.forEach(s => count[s]++);
+  const out = []; 
+  for (let i = max; i >= 0; i--) {
+    for (let j = 0; j < count[i]; j++) {
+      const idx = scores.lastIndexOf(i);
+      out.push(arr[idx]);
+      scores[idx] = -1;
+    }
+  }
+  return out;
+}
+
+function sortStudents(arr) {
+  switch (currentAlgo) {
+    case 'merge': return mergeSort(arr);
+    case 'quick': return quickSort(arr);
+    case 'heap': return heapSort(arr);
+    case 'bubble': return bubbleSort(arr);
+    case 'insertion': return insertionSort(arr);
+    case 'selection': return selectionSort(arr);
+    case 'counting': return countingSort(arr);
+    default: return mergeSort(arr);
+  }
+}
+
+/* ===================================================
+   MERIT LIST
+=================================================== */
+function generateMeritList() {
+  const dept = document.getElementById('meritDept').value;
+  const seats = parseInt(document.getElementById('seatLimit').value) || 50;
+  document.getElementById('meritSeats').textContent = seats;
+  document.getElementById('meritListTitle').textContent = dept || 'All Departments';
+
+  let arr = dept ? students.filter(s => s.dept === dept) : [...students];
+
+  // Visualize sort bars
+  visualizeSortBars(arr);
+  renderAlgoComplexity();
+
+  const sorted = sortStudents(arr);
+  const tbody = document.getElementById('meritTable');
+
+  document.getElementById('meritSelected').textContent = Math.min(sorted.length, seats);
+  document.getElementById('meritWaiting').textContent = Math.max(0, sorted.length - seats);
+
+  if (!sorted.length) {
+    tbody.innerHTML = '';
+    document.getElementById('meritEmpty').style.display = 'block';
+    logSort('No students to sort.');
+    return;
+  }
+  document.getElementById('meritEmpty').style.display = 'none';
+
+  const maxMarks = sorted[0] ? sorted[0].marks : 1;
+  tbody.innerHTML = sorted.map((s, i) => {
+    const rank = i + 1;
+    const p = pct(s.marks, s.total);
+    const g = grade(parseFloat(p));
+    const selected = rank <= seats;
+    const barW = Math.round((s.marks / (s.total)) * 100);
+    return `<tr style="${selected ? '' : 'opacity:0.6'}">
+      <td>${rankNode(rank)}</td>
+      <td class="mono" style="color:var(--accent2)">${s.roll}</td>
+      <td style="font-weight:500">${s.name}</td>
+      <td><span class="badge badge-cyan">${s.dept}</span></td>
+      <td class="mono">${s.marks}/${s.total}</td>
+      <td class="mono">${p}%</td>
+      <td>${gradeBadge(g)}</td>
+      <td>${selected ? '<span class="badge badge-green">✅ Selected</span>' : '<span class="badge badge-yellow">⏳ Waiting</span>'}</td>
+      <td style="min-width:100px">
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:${barW}%;background:${selected ? 'var(--accent)' : 'var(--border)'}"></div></div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  logSort(`✅ Sorted ${sorted.length} students using ${currentAlgo.charAt(0).toUpperCase()+currentAlgo.slice(1)} Sort. Merit list generated.\n` +
+    `Selected: ${Math.min(sorted.length, seats)} | Waiting: ${Math.max(0, sorted.length-seats)}`);
+  addActivity(`📋 Merit list generated (${currentAlgo} sort, ${sorted.length} students)`);
+}
+
+function visualizeSortBars(arr) {
+  const container = document.getElementById('sortBars');
+  const sample = arr.slice(0, Math.min(arr.length, 40));
+  const max = Math.max(...sample.map(s => s.marks), 1);
+  container.innerHTML = sample.map((s, i) => {
+    const h = Math.round((s.marks / max) * 70) + 4;
+    const hue = Math.round((s.marks / max) * 120);
+    return `<div class="dsa-bar" id="bar_${i}" style="height:${h}px;background:hsl(${hue},70%,50%)"></div>`;
+  }).join('');
+
+  setTimeout(() => {
+    const sorted = sortStudents(sample);
+    sorted.forEach((s, i) => {
+      const bar = document.getElementById(`bar_${i}`);
+      if (bar) { bar.classList.add('sorted'); }
+    });
+  }, 600);
+}
+
+function logSort(msg) {
+  document.getElementById('sortLog').innerHTML = msg.split('\n').map(l => `<span class="log-line done">${l}</span>`).join('');
+}
+
+/* ===================================================
+   EXPORT
+=================================================== */
+function exportCSV() {
+  if (!students.length) { notify('No students to export!', 'error'); return; }
+  const ranked = getRankedStudents(students);
+  const rMap = {};
+  ranked.forEach(s => rMap[s.roll] = s.rank);
+  const rows = [['Rank','Roll No','Name','Department','Marks','Total','Percentage','Grade','City','Gender','Email']];
+  students.forEach(s => {
+    const p = pct(s.marks, s.total);
+    rows.push([rMap[s.roll]||'',s.roll,s.name,s.dept,s.marks,s.total,p+'%',grade(parseFloat(p)),s.city||'',s.gender||'',s.email||'']);
+  });
+  const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'merit_list.csv'; a.click();
+  notify('CSV exported!', 'success');
+  addActivity('📥 CSV exported');
+}
+
+function exportMeritPDF() {
+  window.print();
+  addActivity('📄 Merit list printed');
+}
+
+/* ===================================================
+   DSA — DOUBLY LINKED LIST
+=================================================== */
+class LLNode { constructor(data) { this.data = data; this.prev = null; this.next = null; } }
+
+function llInsertHead() {
+  const s = students[Math.floor(Math.random() * students.length)];
+  const data = s || { roll: `X-${Date.now().toString().slice(-4)}`, name: 'Node', marks: Math.floor(Math.random()*900)+100 };
+  const node = new LLNode(data);
+  if (!ll.head) { ll.head = ll.tail = node; }
+  else { node.next = ll.head; ll.head.prev = node; ll.head = node; }
+  ll.size++;
+  renderLL();
+  document.getElementById('bstLog') && (document.getElementById('bstLog').innerHTML = `Inserted at head: ${data.name}`);
+}
+function llInsertTail() {
+  const s = students[Math.floor(Math.random() * students.length)];
+  const data = s || { roll: `X-${Date.now().toString().slice(-4)}`, name: 'Node', marks: Math.floor(Math.random()*900)+100 };
+  const node = new LLNode(data);
+  if (!ll.tail) { ll.head = ll.tail = node; }
+  else { node.prev = ll.tail; ll.tail.next = node; ll.tail = node; }
+  ll.size++;
+  renderLL();
+}
+function llDeleteHead() {
+  if (!ll.head) { notify('List is empty!', 'error'); return; }
+  ll.head = ll.head.next;
+  if (ll.head) ll.head.prev = null; else ll.tail = null;
+  ll.size--;
+  renderLL();
+}
+function llDeleteTail() {
+  if (!ll.tail) { notify('List is empty!', 'error'); return; }
+  ll.tail = ll.tail.prev;
+  if (ll.tail) ll.tail.next = null; else ll.head = null;
+  ll.size--;
+  renderLL();
+}
+function llFromStudents() {
+  ll = { head: null, tail: null, size: 0 };
+  students.forEach(s => {
+    const node = new LLNode(s);
+    if (!ll.tail) { ll.head = ll.tail = node; }
+    else { node.prev = ll.tail; ll.tail.next = node; ll.tail = node; }
+    ll.size++;
+  });
+  renderLL();
+  notify(`Loaded ${ll.size} students into linked list.`, 'success');
+}
+function llClear() { ll = { head: null, tail: null, size: 0 }; renderLL(); }
+
+function renderLL() {
+  const vis = document.getElementById('llVis');
+  const tbl = document.getElementById('llTable');
+  if (!ll.head) {
+    vis.innerHTML = '<span class="ll-null">NULL (empty list)</span>';
+    tbl.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">Empty</td></tr>';
+    return;
+  }
+  let html = '', rows = '', cur = ll.head, idx = 0;
+  while (cur) {
+    const isHead = cur === ll.head, isTail = cur === ll.tail;
+    html += `<div class="ll-node ${isHead?'head':''} ${isTail?'tail':''}">
+      <div>
+        <div style="color:var(--accent2);font-size:10px">${isHead?'HEAD ':isTail?'TAIL ':''}</div>
+        <div>${cur.data.roll||'#'}</div>
+        <div style="color:var(--text3)">${cur.data.marks}</div>
+      </div>
+    </div>`;
+    if (cur.next) html += `<span class="ll-arrow">⇄</span>`;
+    rows += `<tr>
+      <td class="mono">${idx}</td>
+      <td class="mono">${cur.data.roll}</td>
+      <td>${cur.data.name||''}</td>
+      <td class="mono">${cur.data.marks}</td>
+      <td style="color:var(--text3)">${cur.prev ? cur.prev.data.roll : 'NULL'}</td>
+      <td style="color:var(--text3)">${cur.next ? cur.next.data.roll : 'NULL'}</td>
+    </tr>`;
+    cur = cur.next; idx++;
+  }
+  html += `<span class="ll-null">→ NULL</span>`;
+  vis.innerHTML = html;
+  tbl.innerHTML = rows;
+}
+
+/* ===================================================
+   DSA — BST
+=================================================== */
+class BSTNode { constructor(val, data) { this.val = val; this.data = data; this.left = null; this.right = null; } }
+
+function bstInsert(root, val, data) {
+  if (!root) return new BSTNode(val, data);
+  if (val < root.val) root.left = bstInsert(root.left, val, data);
+  else if (val > root.val) root.right = bstInsert(root.right, val, data);
+  return root;
+}
+
+function bstInsertRandom() {
+  const val = Math.floor(Math.random() * 900) + 100;
+  bst.root = bstInsert(bst.root, val, { roll: `R-${val}`, name: `Node ${val}`, marks: val });
+  drawBST();
+  document.getElementById('bstLog').innerHTML = `<span class="log-line done">Inserted node: ${val}</span>`;
+}
+
+function bstBuildFromStudents() {
+  bst.root = null;
+  students.forEach(s => { bst.root = bstInsert(bst.root, s.marks, s); });
+  drawBST();
+  document.getElementById('bstLog').innerHTML = `<span class="log-line done">BST built from ${students.length} students.</span>`;
+  notify(`BST built from ${students.length} students.`, 'success');
+}
+
+function bstClear() { bst.root = null; drawBST(); document.getElementById('bstLog').innerHTML = 'BST cleared.'; }
+
+function inOrder(node, res) { if (!node) return; inOrder(node.left, res); res.push(node.val); inOrder(node.right, res); }
+function preOrder(node, res) { if (!node) return; res.push(node.val); preOrder(node.left, res); preOrder(node.right, res); }
+function postOrder(node, res) { if (!node) return; postOrder(node.left, res); postOrder(node.right, res); res.push(node.val); }
+
+function bstInOrder() { const r = []; inOrder(bst.root, r); document.getElementById('bstLog').innerHTML = `<span class="log-line done">In-Order (sorted): ${r.slice(0,20).join(' → ')}${r.length>20?'…':''}</span>`; }
+function bstPreOrder() { const r = []; preOrder(bst.root, r); document.getElementById('bstLog').innerHTML = `<span class="log-line done">Pre-Order: ${r.slice(0,20).join(' → ')}${r.length>20?'…':''}</span>`; }
+function bstPostOrder() { const r = []; postOrder(bst.root, r); document.getElementById('bstLog').innerHTML = `<span class="log-line done">Post-Order: ${r.slice(0,20).join(' → ')}${r.length>20?'…':''}</span>`; }
+
+function bstSearch() {
+  const val = parseInt(document.getElementById('bstSearch').value);
+  if (isNaN(val)) return;
+  let cur = bst.root, steps = 0, path = [];
+  while (cur) {
+    steps++; path.push(cur.val);
+    if (val === cur.val) {
+      document.getElementById('bstLog').innerHTML = `<span class="log-line done">✅ Found ${val} in ${steps} steps. Path: ${path.join(' → ')}</span>`;
+      return;
+    }
+    cur = val < cur.val ? cur.left : cur.right;
+  }
+  document.getElementById('bstLog').innerHTML = `<span class="log-line done">❌ ${val} not found. Steps: ${steps}. Path: ${path.join(' → ')}</span>`;
+}
+
+function drawBST() {
+  const canvas = document.getElementById('bstCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!bst.root) {
+    ctx.fillStyle = '#64748b';
+    ctx.font = '14px DM Sans';
+    ctx.textAlign = 'center';
+    ctx.fillText('BST is empty. Insert nodes or build from students.', canvas.width/2, canvas.height/2);
+    return;
+  }
+
+  function getHeight(node) { if (!node) return 0; return 1 + Math.max(getHeight(node.left), getHeight(node.right)); }
+  const H = Math.min(getHeight(bst.root), 6);
+
+  function drawNode(node, x, y, gap, depth) {
+    if (!node || depth > 6) return;
+    const radius = 20;
+    if (node.left && depth < 6) {
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - gap, y + 70);
+      ctx.strokeStyle = '#2a3a55'; ctx.lineWidth = 1.5; ctx.stroke();
+      drawNode(node.left, x - gap, y + 70, gap / 2, depth + 1);
+    }
+    if (node.right && depth < 6) {
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + gap, y + 70);
+      ctx.strokeStyle = '#2a3a55'; ctx.lineWidth = 1.5; ctx.stroke();
+      drawNode(node.right, x + gap, y + 70, gap / 2, depth + 1);
+    }
+    ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2);
+    const grad = ctx.createRadialGradient(x-4, y-4, 2, x, y, radius);
+    grad.addColorStop(0, '#3b82f6'); grad.addColorStop(1, '#1e40af');
+    ctx.fillStyle = grad; ctx.fill();
+    ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 10px JetBrains Mono';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(node.val, x, y);
+  }
+  drawNode(bst.root, canvas.width / 2, 36, canvas.width / 4, 1);
+}
+
+/* ===================================================
+   DSA — QUEUE & STACK
+=================================================== */
+function queueEnqueue() {
+  const s = students[queue.length % Math.max(students.length,1)];
+  const item = s ? s.name : `Student-${Date.now().toString().slice(-3)}`;
+  queue.push(item);
+  document.getElementById('qsLog').innerHTML = `<span class="log-line done">Enqueued: "${item}" | Queue size: ${queue.length}</span>`;
+  renderQS();
+}
+function queueDequeue() {
+  if (!queue.length) { notify('Queue empty!', 'error'); return; }
+  const item = queue.shift();
+  document.getElementById('qsLog').innerHTML = `<span class="log-line done">Dequeued: "${item}" | Queue size: ${queue.length}</span>`;
+  renderQS();
+}
+function stackPush() {
+  const s = students[stack.length % Math.max(students.length,1)];
+  const item = s ? s.name : `Op-${Date.now().toString().slice(-3)}`;
+  stack.push(item);
+  document.getElementById('qsLog').innerHTML = `<span class="log-line done">Pushed: "${item}" | Stack size: ${stack.length}</span>`;
+  renderQS();
+}
+function stackPop() {
+  if (!stack.length) { notify('Stack empty!', 'error'); return; }
+  const item = stack.pop();
+  document.getElementById('qsLog').innerHTML = `<span class="log-line done">Popped: "${item}" | Stack size: ${stack.length}</span>`;
+  renderQS();
+}
+function qsLoadStudents() {
+  queue = students.slice(0, 8).map(s => s.name);
+  stack = students.slice(0, 6).map(s => s.name);
+  renderQS();
+  notify('Loaded from students!', 'success');
+}
+function qsClear() { queue = []; stack = []; renderQS(); }
+
+function renderQS() {
+  const el = document.getElementById('qsVis');
+  const qHtml = `<div class="qs-col">
+    <div class="qs-label">Queue (FIFO) — Admission Waiting List</div>
+    <div class="qs-items">
+      ${queue.length ? queue.map((item, i) => `<div class="qs-item ${i===0?'front':''}">${i===0?'→ ':'  '}${item}${i===0?' [FRONT]':''}</div>`).join('') : '<div class="qs-item" style="color:var(--text3)">Empty</div>'}
+    </div>
+    ${queue.length ? `<div class="text-xs mt-1">Front: ${queue[0]} | Rear: ${queue[queue.length-1]}</div>` : ''}
+  </div>`;
+
+  const sHtml = `<div class="qs-col">
+    <div class="qs-label">Stack (LIFO) — Operation History</div>
+    <div class="qs-items">
+      ${stack.length ? [...stack].reverse().map((item, i) => `<div class="qs-item ${i===0?'top':''}">${i===0?'↑ ':'  '}${item}${i===0?' [TOP]':''}</div>`).join('') : '<div class="qs-item" style="color:var(--text3)">Empty</div>'}
+    </div>
+    ${stack.length ? `<div class="text-xs mt-1">Top: ${stack[stack.length-1]} | Bottom: ${stack[0]}</div>` : ''}
+  </div>`;
+
+  el.innerHTML = qHtml + sHtml;
+}
+
+/* ===================================================
+   DSA — HASH TABLE
+=================================================== */
+function hashFn(key) {
+  let h = 0;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) % 16;
+  return h;
+}
+function hashInsert() {
+  const key = document.getElementById('hashKey').value.trim() || `KEY-${Math.floor(Math.random()*9000)+1000}`;
+  const bucket = hashFn(key);
+  if (!hashTable[bucket].find(e => e.key === key)) {
+    const s = students.find(x => x.roll === key);
+    hashTable[bucket].push({ key, value: s ? s.name : key });
+    document.getElementById('hashLog').innerHTML = `<span class="log-line done">Inserted "${key}" → bucket[${bucket}] | Hash: h("${key}") = ${bucket}</span>`;
+  } else {
+    document.getElementById('hashLog').innerHTML = `<span class="log-line">Key "${key}" already exists in bucket[${bucket}].</span>`;
+  }
+  renderHashGrid();
+}
+function hashSearch() {
+  const key = document.getElementById('hashKey').value.trim();
+  if (!key) return;
+  const bucket = hashFn(key);
+  const found = hashTable[bucket].find(e => e.key === key);
+  document.getElementById('hashLog').innerHTML = found
+    ? `<span class="log-line done">✅ Found "${key}" in bucket[${bucket}] → Value: ${found.value}</span>`
+    : `<span class="log-line done">❌ "${key}" not found. Checked bucket[${bucket}]. Hash = ${bucket}</span>`;
+}
+function hashDelete() {
+  const key = document.getElementById('hashKey').value.trim();
+  const bucket = hashFn(key);
+  const idx = hashTable[bucket].findIndex(e => e.key === key);
+  if (idx !== -1) {
+    hashTable[bucket].splice(idx, 1);
+    document.getElementById('hashLog').innerHTML = `<span class="log-line done">Deleted "${key}" from bucket[${bucket}]</span>`;
+  } else {
+    document.getElementById('hashLog').innerHTML = `<span class="log-line">Key "${key}" not found.</span>`;
+  }
+  renderHashGrid();
+}
+function hashBuildFromStudents() {
+  hashTable = new Array(16).fill(null).map(() => []);
+  students.forEach(s => {
+    const bucket = hashFn(s.roll);
+    hashTable[bucket].push({ key: s.roll, value: s.name });
+  });
+  renderHashGrid();
+  notify(`Hash table built from ${students.length} students!`, 'success');
+  document.getElementById('hashLog').innerHTML = `<span class="log-line done">Built hash table from ${students.length} students. Table size: 16</span>`;
+}
+function hashClear() { hashTable = new Array(16).fill(null).map(() => []); renderHashGrid(); }
+
+function renderHashGrid() {
+  document.getElementById('hashGrid').innerHTML = hashTable.map((bucket, i) => `
+    <div class="hash-bucket">
+      <div class="hash-bucket-idx">bucket[${i}]</div>
+      ${bucket.length ? bucket.map(e => `<div class="hash-bucket-val">${e.key}</div>`).join('') : '<div style="color:var(--border);font-size:10px">—</div>'}
+    </div>`).join('');
+}
+
+/* ===================================================
+   DSA TABS
+=================================================== */
+function switchDSATab(name, el) {
+  ['linked','bst','queue','hash','complexity'].forEach(t => {
+    const d = document.getElementById(`dsa-${t}`);
+    if (d) d.style.display = t === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('#dsaTabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  if (name === 'bst') drawBST();
+  if (name === 'hash') renderHashGrid();
+  if (name === 'complexity') renderComplexityCards();
+}
+
+/* ===================================================
+   COMPLEXITY CARDS
+=================================================== */
+const allComplexities = [
+  { name: 'Array', ops: [['Access','O(1)'],['Search','O(n)'],['Insert','O(n)'],['Delete','O(n)']] },
+  { name: 'Linked List', ops: [['Access','O(n)'],['Search','O(n)'],['Insert Head','O(1)'],['Delete Head','O(1)']] },
+  { name: 'BST (avg)', ops: [['Search','O(log n)'],['Insert','O(log n)'],['Delete','O(log n)'],['Traverse','O(n)']] },
+  { name: 'Hash Table', ops: [['Search','O(1) avg'],['Insert','O(1) avg'],['Delete','O(1) avg'],['Space','O(n)']] },
+  { name: 'Queue', ops: [['Enqueue','O(1)'],['Dequeue','O(1)'],['Peek','O(1)'],['Space','O(n)']] },
+  { name: 'Stack', ops: [['Push','O(1)'],['Pop','O(1)'],['Peek','O(1)'],['Space','O(n)']] },
+  { name: 'Merge Sort', ops: [['Best','O(n log n)'],['Avg','O(n log n)'],['Worst','O(n log n)'],['Space','O(n)']] },
+  { name: 'Quick Sort', ops: [['Best','O(n log n)'],['Avg','O(n log n)'],['Worst','O(n²)'],['Space','O(log n)']] },
+  { name: 'Heap Sort', ops: [['Best','O(n log n)'],['Avg','O(n log n)'],['Worst','O(n log n)'],['Space','O(1)']] },
+  { name: 'Bubble Sort', ops: [['Best','O(n)'],['Avg','O(n²)'],['Worst','O(n²)'],['Space','O(1)']] },
+  { name: 'Binary Search', ops: [['Best','O(1)'],['Avg','O(log n)'],['Worst','O(log n)'],['Space','O(1)']] },
+  { name: 'Linear Search', ops: [['Best','O(1)'],['Avg','O(n)'],['Worst','O(n)'],['Space','O(1)']] },
+];
+
+function renderComplexityCards() {
+  document.getElementById('complexityCards').innerHTML = allComplexities.map(c => `
+    <div class="complexity-card">
+      <div class="complexity-name">${c.name}</div>
+      ${c.ops.map(([k,v]) => `<div class="complexity-row"><span class="complexity-key">${k}</span><span class="complexity-val">${v}</span></div>`).join('')}
+    </div>`).join('');
+}
+
+function renderAboutComplexity() {
+  document.getElementById('aboutComplexity').innerHTML = allComplexities.slice(0,6).map(c => `
+    <div class="complexity-card">
+      <div class="complexity-name">${c.name}</div>
+      ${c.ops.map(([k,v]) => `<div class="complexity-row"><span class="complexity-key">${k}</span><span class="complexity-val">${v}</span></div>`).join('')}
+    </div>`).join('');
+}
+
+/* ===================================================
+   SEARCH ALGORITHMS
+=================================================== */
+function selectSearch(type, el) {
+  currentSearch = type;
+  document.querySelectorAll('#sec-search .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function linearSearch(arr, key, field) {
+  const log = [];
+  for (let i = 0; i < arr.length; i++) {
+    const val = String(arr[i][field] || '').toLowerCase();
+    log.push({ idx: i, match: val.includes(key.toLowerCase()) });
+    if (val.includes(key.toLowerCase())) {}
+  }
+  return { results: arr.filter(s => String(s[field]||'').toLowerCase().includes(key.toLowerCase())), log, steps: arr.length };
+}
+
+function binarySearch(arr, key, field) {
+  const sorted = [...arr].sort((a,b) => String(a[field]).localeCompare(String(b[field])));
+  const log = []; let lo = 0, hi = sorted.length - 1, results = [];
+  while (lo <= hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    log.push({ idx: mid });
+    const val = String(sorted[mid][field] || '').toLowerCase();
+    if (val.includes(key.toLowerCase())) { results.push(sorted[mid]); break; }
+    if (val < key.toLowerCase()) lo = mid + 1;
+    else hi = mid - 1;
+  }
+  return { results, log, steps: log.length };
+}
+
+function jumpSearch(arr, key, field) {
+  const sorted = [...arr].sort((a,b) => String(a[field]).localeCompare(String(b[field])));
+  const n = sorted.length, step = Math.floor(Math.sqrt(n));
+  let prev = 0, log = [], results = [];
+  while (prev < n && String(sorted[Math.min(step, n)-1][field]).toLowerCase() < key.toLowerCase()) {
+    log.push({ idx: Math.min(step, n)-1 }); prev = step; step += Math.floor(Math.sqrt(n));
+    if (prev >= n) break;
+  }
+  for (let i = prev; i < Math.min(step, n); i++) {
+    log.push({ idx: i });
+    if (String(sorted[i][field]||'').toLowerCase().includes(key.toLowerCase())) results.push(sorted[i]);
+  }
+  return { results, log, steps: log.length };
+}
+
+function hashSearchAlgo(arr, key, field) {
+  const map = {};
+  arr.forEach(s => { const k = String(s[field]||'').toLowerCase(); if (!map[k]) map[k] = []; map[k].push(s); });
+  const results = [];
+  Object.keys(map).forEach(k => { if (k.includes(key.toLowerCase())) results.push(...map[k]); });
+  return { results, log: [], steps: 1 };
+}
+
+function runAdvSearch() {
+  const key = document.getElementById('advSearch').value.trim();
+  const field = document.getElementById('searchField').value;
+  if (!key) { notify('Enter a search term!', 'error'); return; }
+  if (!students.length) { notify('No students to search!', 'error'); return; }
+
+  let res;
+  if (currentSearch === 'linear') res = linearSearch(students, key, field);
+  else if (currentSearch === 'binary') res = binarySearch(students, key, field);
+  else if (currentSearch === 'jump') res = jumpSearch(students, key, field);
+  else res = hashSearchAlgo(students, key, field);
+
+  document.getElementById('srchCount').textContent = res.results.length;
+  document.getElementById('searchLog').innerHTML = `<span class="log-line done">Algorithm: ${currentSearch.toUpperCase()} | Steps: ${res.steps} | Found: ${res.results.length} | Query: "${key}" in field: ${field}</span>`;
+
+  // Visualization
+  const vis = document.getElementById('searchVis');
+  vis.innerHTML = students.slice(0,50).map((s, i) => {
+    const isMatch = res.results.find(r => r.roll === s.roll);
+    const isChecked = res.log.find(l => l.idx === i);
+    let bg = 'var(--surface3)';
+    if (isMatch) bg = 'rgba(16,185,129,0.3)';
+    else if (isChecked) bg = 'rgba(59,130,246,0.2)';
+    return `<div style="width:18px;height:18px;border-radius:3px;background:${bg};border:1px solid var(--border);cursor:default;transition:background 0.3s;" title="${s.name}"></div>`;
+  }).join('');
+
+  const tbody = document.getElementById('searchResultTable');
+  const ranked = getRankedStudents(students);
+  const rMap = {}; ranked.forEach(s => rMap[s.roll] = s.rank);
+
+  if (!res.results.length) {
+    tbody.innerHTML = '';
+    document.getElementById('srchEmpty').style.display = 'block';
+  } else {
+    document.getElementById('srchEmpty').style.display = 'none';
+    tbody.innerHTML = res.results.map(s => {
+      const p = pct(s.marks, s.total);
+      const g = grade(parseFloat(p));
+      return `<tr>
+        <td>${rankNode(rMap[s.roll]||'-')}</td>
+        <td class="mono" style="color:var(--accent2)">${s.roll}</td>
+        <td style="font-weight:500">${s.name}</td>
+        <td><span class="badge badge-cyan">${s.dept}</span></td>
+        <td class="mono">${s.marks}/${s.total}</td>
+        <td class="mono">${p}%</td>
+        <td>${gradeBadge(g)}</td>
+      </tr>`;
+    }).join('');
+  }
+  addActivity(`🔍 Search: "${key}" (${currentSearch}) → ${res.results.length} result(s)`);
+}
+
+/* ===================================================
+   INIT
+=================================================== */
+renderAlgoComplexity();
+updateDashboard();
+renderLL();
+renderQS();
+renderHashGrid();
+drawBST();
+renderActivity();
+</script>
+</body>
+</html>
